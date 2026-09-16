@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: mti-office-expense-ledger
+    runtime: node
+    plan: free
+    buildCommand: tar -xf mti-ledger-source.zip && npm install
+    startCommand: node server.js
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false
+      - key: SECRET_KEY
+        generateValue: true
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: APP_TIMEZONE
+        value: Asia/Dhaka
