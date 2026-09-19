@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="bn">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0f766e">
+  <meta name="ledger-api-base" content="https://jngnjrtxrhrzsmnkvbte.supabase.co/functions/v1/ledger/">
+  <title>Office Expense Ledger</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="flash" class="flash" role="status" aria-live="polite"></div>
+
+  <main id="auth-screen" class="auth-shell">
+    <section class="auth-visual" aria-label="MTI International travel services">
+      <img src="assets/mti-travel-banner.png" alt="MTI International — your journey, our commitment">
+    </section>
+    <section class="auth-card">
+      <img class="auth-logo" src="assets/mti-logo.png" alt="MTI International">
+      <p class="eyebrow">OFFICE EXPENSE LEDGER</p>
+      <h1>অফিস খরচের সহজ হিসাব</h1>
+      <p class="muted">আপনার হিসাব স্থায়ীভাবে সংরক্ষিত থাকবে।</p>
+
+      <form id="setup-form" class="auth-form" hidden>
+        <h2>প্রথমবার সেটআপ</h2>
+        <p class="muted">আপনার Admin account তৈরি করুন।</p>
+        <label>Username / Login ID<input name="username" autocomplete="username" required minlength="3" maxlength="50" pattern="[A-Za-z0-9._-]+"></label>
+        <label>Password<input name="password" type="password" autocomplete="new-password" required minlength="10" maxlength="200"></label>
+        <label>Confirm Password<input name="confirm_password" type="password" autocomplete="new-password" required minlength="10" maxlength="200"></label>
+        <button class="primary wide" type="submit">Create Admin Account</button>
+        <p class="form-hint">Password অন্তত ১০ অক্ষরের দিন।</p>
+      </form>
+
+      <form id="login-form" class="auth-form" hidden>
+        <h2>Login</h2>
+        <label>Username / Login ID<input name="username" autocomplete="username" required maxlength="50"></label>
+        <label>Password<input name="password" type="password" autocomplete="current-password" required maxlength="200"></label>
+        <button class="primary wide" type="submit">Login</button>
+      </form>
+    </section>
+  </main>
+
+  <div id="app-shell" class="app-shell" hidden>
+    <aside class="sidebar">
+      <div class="sidebar-brand"><img class="sidebar-logo" src="assets/mti-logo.png" alt="MTI International"><div><strong>MTI International</strong><small>Office Expense Ledger</small></div></div>
+      <nav aria-label="Main navigation">
+        <button class="nav-link active" data-page="dashboard"><span>⌂</span> Dashboard</button>
+        <button class="nav-link" data-page="expense"><span>＋</span> Add Expense</button>
+        <button class="nav-link" data-page="ledger"><span>▤</span> Ledger</button>
+        <button class="nav-link" data-page="report"><span>▥</span> Monthly Report</button>
+        <button class="nav-link" data-page="types"><span>⊞</span> Expense Types</button>
+        <button class="nav-link" data-page="backup"><span>⇩</span> Backup</button>
+        <button class="nav-link" data-page="settings"><span>⚙</span> Settings</button>
+      </nav>
+      <button id="logout-button" class="logout-button"><span>↪</span> Logout</button>
+    </aside>
+
+    <section class="content-shell">
+      <header class="topbar">
+        <button id="mobile-menu" class="mobile-menu" aria-label="Open navigation">☰</button>
+        <img class="mobile-brand-logo" src="assets/mti-logo.png" alt="MTI International">
+        <div><p class="eyebrow" id="page-kicker">OVERVIEW</p><h1 id="page-title">Dashboard</h1></div>
+        <div class="user-chip"><span class="avatar">A</span><span id="user-name">Admin</span></div>
+      </header>
+
+      <main class="content">
+        <section class="page active" data-page-content="dashboard">
+          <div class="card-grid summary-grid">
+            <article class="summary-card"><p>আজকের খরচ <span>Today</span></p><strong id="today-total">৳ 0</strong></article>
+            <article class="summary-card"><p>এই মাস <span>This Month</span></p><strong id="month-total">৳ 0</strong></article>
+            <article class="summary-card"><p>মোট খরচ <span>Total Expense</span></p><strong id="all-total">৳ 0</strong></article>
+            <article class="summary-card accent"><p>Visa Fee খরচ</p><strong id="visa-total">৳ 0</strong></article>
+          </div>
+          <section class="panel">
+            <div class="section-heading"><div><h2>সাম্প্রতিক খরচ</h2><p>Recent Expenses</p></div><button class="text-button" data-go="ledger">সব দেখুন →</button></div>
+            <div class="table-wrap"><table><thead><tr><th>Date</th><th>Expense Type</th><th>Description</th><th class="amount">Amount</th><th>Payment</th></tr></thead><tbody id="recent-body"></tbody></table></div>
+          </section>
+        </section>
+
+        <section class="page" data-page-content="expense">
+          <div class="page-intro"><div><h2 id="expense-form-title">নতুন খরচ লিখুন</h2><p>খাতার মতো সহজে expense entry করুন।</p></div></div>
+          <form id="expense-form" class="panel form-panel">
+            <div class="form-grid">
+              <label>Date<input name="expense_date" type="date" required></label>
+              <label>Expense Type<select name="expense_type_id" id="expense-type-select" required></select></label>
+              <label class="wide-field">Description<input name="description" placeholder="যেমন: Malaysia Visa application fee" required maxlength="240"></label>
+              <label>Amount (BDT)<div class="money-input"><span>৳</span><input name="amount" type="number" min="0.01" max="99999999.99" step="0.01" inputmode="decimal" placeholder="0" required></div></label>
+              <label>Payment Method<select name="payment_method" required><option value="Cash">Cash</option><option value="Bank">Bank</option><option value="bKash">bKash</option><option value="Nagad">Nagad</option><option value="Card">Card</option><option value="Other">Other</option></select></label>
+              <label>Paid To <span class="optional">Optional</span><input name="paid_to" placeholder="যেমন: VFS" maxlength="160"></label>
+              <label class="wide-field">Note <span class="optional">Optional</span><textarea name="note" rows="3" maxlength="1000" placeholder="অতিরিক্ত তথ্য লিখুন"></textarea></label>
+            </div>
+            <div class="form-actions"><button class="primary" id="expense-save-button" type="submit">Save Expense</button><button class="secondary" id="expense-cancel-button" type="button">Cancel</button></div>
+          </form>
+        </section>
+
+        <section class="page" data-page-content="ledger">
+          <div class="section-heading ledger-heading"><div><h2>Expense Ledger</h2><p>আপনার সব খরচের ডিজিটাল খাতা</p></div><button class="primary" data-go="expense">＋ Add Expense</button></div>
+          <section class="panel filters">
+            <div class="filter-row">
+              <label>সময়কাল<select id="ledger-range"><option value="today">Today</option><option value="this-week">This Week</option><option value="this-month" selected>This Month</option><option value="custom">Custom Date Range</option><option value="all">All Time</option></select></label>
+              <label class="custom-date" hidden>From Date<input id="ledger-from" type="date"></label>
+              <label class="custom-date" hidden>To Date<input id="ledger-to" type="date"></label>
+              <form id="ledger-search" class="search-box"><input id="ledger-query" type="search" placeholder="Search description, paid to, type"><button type="submit">Search</button></form>
+            </div>
+            <p id="ledger-total" class="filter-total">Total: ৳ 0</p>
+          </section>
+          <section class="panel table-panel"><div class="table-wrap"><table class="ledger-table"><thead><tr><th>Date</th><th>Expense Type</th><th>Description</th><th class="amount">Amount</th><th>Payment Method</th><th>Paid To</th><th>Note</th><th>Action</th></tr></thead><tbody id="ledger-body"></tbody></table></div></section>
+        </section>
+
+        <section class="page" data-page-content="report">
+          <div class="section-heading"><div><h2>Monthly Report</h2><p>মাসভিত্তিক খরচ ও payment হিসাব</p></div><label class="month-picker">Month<input id="report-month" type="month"></label></div>
+          <div class="card-grid report-grid">
+            <article class="summary-card"><p>Total Expense</p><strong id="report-total">৳ 0</strong></article>
+            <article class="summary-card accent"><p>Visa Fee Total</p><strong id="report-visa">৳ 0</strong></article>
+          </div>
+          <section class="panel"><div class="section-heading compact"><div><h2>Payment Method হিসাব</h2><p>Actual expense data থেকে হিসাব</p></div></div><div id="payment-totals" class="payment-grid"></div></section>
+          <section class="panel table-panel"><div class="section-heading compact"><div><h2>এই মাসের খরচ</h2></div></div><div class="table-wrap"><table><thead><tr><th>Date</th><th>Expense Type</th><th>Description</th><th class="amount">Amount</th><th>Payment</th><th>Paid To</th></tr></thead><tbody id="report-body"></tbody></table></div></section>
+        </section>
+
+        <section class="page" data-page-content="types">
+          <div class="section-heading"><div><h2>Expense Types</h2><p>নতুন খরচের ধরন যোগ বা বন্ধ করুন।</p></div></div>
+          <div class="two-column">
+            <form id="type-form" class="panel small-panel"><h2>+ Add Expense Type</h2><label>Expense Type Name<input name="name" placeholder="যেমন: Office Rent" required maxlength="80"></label><button class="primary" type="submit">Add Type</button></form>
+            <section class="panel table-panel"><div class="table-wrap"><table><thead><tr><th>Expense Type</th><th>Status</th><th>Action</th></tr></thead><tbody id="type-body"></tbody></table></div></section>
+          </div>
+        </section>
+
+        <section class="page" data-page-content="backup">
+          <div class="section-heading"><div><h2>Backup & Restore</h2><p>আপনার হিসাব নিজের কাছে নিরাপদে রাখুন।</p></div></div>
+          <div class="backup-grid">
+            <section class="panel backup-card"><h2>Export Data</h2><p>সম্পূর্ণ খরচ ও expense type backup হিসেবে download করুন।</p><div class="stack-actions"><a class="secondary button-link" data-api-download="api/backup?format=csv" href="#">Download Excel-compatible CSV</a><a class="primary button-link" data-api-download="api/backup?format=json" href="#">Download JSON Backup</a></div></section>
+            <section class="panel backup-card"><h2>Import JSON Backup</h2><p>এই app থেকে export করা JSON file restore করুন। Duplicate expense আবার যোগ হবে না।</p><form id="import-form"><input name="backup" type="file" accept="application/json,.json" required><button class="primary" type="submit">Import Backup</button></form></section>
+          </div>
+          <p class="backup-note">নিয়মিত JSON backup আলাদা নিরাপদ জায়গায় রেখে দিন। CSV মূলত Excel-এ দেখা বা বিশ্লেষণের জন্য।</p>
+        </section>
+
+        <section class="page" data-page-content="settings">
+          <div class="section-heading"><div><h2>Settings</h2><p>Account security ও application information</p></div></div>
+          <div class="two-column settings-grid"><section class="panel small-panel"><h2>Account</h2><p class="muted">Logged in as <strong id="settings-username"></strong></p><p class="muted">Your session uses secure, httpOnly cookies. No password is stored in the browser.</p></section>
+            <form id="password-form" class="panel small-panel"><h2>Change Password</h2><label>Current Password<input name="current_password" type="password" autocomplete="current-password" required></label><label>New Password<input name="new_password" type="password" autocomplete="new-password" required minlength="10"></label><label>Confirm New Password<input name="confirm_password" type="password" autocomplete="new-password" required minlength="10"></label><button class="primary" type="submit">Update Password</button></form>
+          </div>
+        </section>
+      </main>
+    </section>
+  </div>
+
+  <dialog id="expense-dialog"><article><button id="dialog-close" class="dialog-close" aria-label="Close">×</button><h2>Expense Details</h2><dl id="expense-details"></dl></article></dialog>
+  <script src="app.js"></script>
+</body>
+</html>
