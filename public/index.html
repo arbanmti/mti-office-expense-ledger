@@ -55,6 +55,8 @@
         <button class="nav-link" data-page="partners"><span>♧</span> Agents &amp; Offices</button>
         <button class="nav-link" data-page="submissions"><span>⌑</span> Office Contracts</button>
         <button class="nav-link" data-page="manpower-report"><span>▤</span> Manpower Report</button>
+        <p class="nav-section">RECEIPTS</p>
+        <button class="nav-link" data-page="receipts"><span>▣</span> Receipts</button>
         <button class="nav-link" data-page="backup"><span>⇩</span> Backup</button>
         <button class="nav-link" data-page="settings"><span>⚙</span> Settings</button>
       </nav>
@@ -181,6 +183,29 @@
           <div id="manpower-print-area"><div class="card-grid manpower-summary-grid"><article class="summary-card accent"><p>এই মাসে Passenger থেকে পেয়েছি</p><strong id="mp-report-received">৳ 0</strong></article><article class="summary-card blue"><p>এই মাসে Office-এ দিয়েছি</p><strong id="mp-report-office-paid">৳ 0</strong></article><article class="summary-card warning"><p>সব Passenger-এর Due</p><strong id="mp-report-total-due">৳ 0</strong></article><article class="summary-card navy"><p>Active File</p><strong id="mp-report-active-files">0</strong></article></div><section class="panel table-panel"><div class="table-heading"><div><h2>Passenger হিসাব</h2><p>Price, Received ও Due</p></div></div><div class="table-wrap"><table><thead><tr><th>Passenger</th><th>Agent</th><th>Country</th><th class="amount">Price</th><th class="amount">Received</th><th class="amount">Due</th><th>Status</th></tr></thead><tbody id="mp-report-body"></tbody></table></div></section></div>
         </section>
 
+        <section class="page" data-page-content="receipts">
+          <div class="section-heading"><div><p class="eyebrow">RECEIPT CENTER</p><h2>Receipt তৈরি ও Print</h2><p>Booking Receipt এবং Money Receipt আলাদা করে তৈরি, সংরক্ষণ ও পরে আবার print করুন।</p></div></div>
+          <div class="receipt-mode-tabs" role="tablist" aria-label="Receipt type"><button class="receipt-mode active" data-receipt-mode="booking" type="button">▣ Booking Receipt</button><button class="receipt-mode" data-receipt-mode="money" type="button">৳ Money Receipt</button></div>
+
+          <form id="booking-receipt-form" class="panel form-panel receipt-form">
+            <div class="receipt-form-heading"><div><h2>Booking Receipt তৈরি করুন</h2><p>একটি receipt-এ ১টি বা একাধিক Passenger File যোগ করা যাবে।</p></div></div>
+            <div class="form-grid"><label>Receipt Date<input name="receipt_date" type="date" required></label><label>Customer / প্রদানকারীর নাম<input name="customer_name" placeholder="যার নামে receipt হবে" required maxlength="160"></label><label>Mobile <span class="optional">Optional</span><input name="customer_phone" inputmode="tel" maxlength="40"></label><label>Received By<input name="received_by" required maxlength="120"></label><label>Payment Method<select name="payment_method"><option>Cash</option><option>Bank</option><option>bKash</option><option>Nagad</option><option>Card</option><option>Other</option></select></label><label class="wide-field">Note <span class="optional">Optional</span><textarea name="note" rows="2" maxlength="1000" placeholder="Booking বা service-এর অতিরিক্ত তথ্য"></textarea></label></div>
+            <div class="receipt-items-heading"><div><h3>Booking / Passenger File</h3><p>Passenger বাছুন, amount ঠিক করুন; country ও passport স্বয়ংক্রিয়ভাবে দেখাবে।</p></div><button id="add-booking-item" class="secondary" type="button">＋ আরও Passenger যোগ করুন</button></div>
+            <div id="booking-items" class="booking-items"></div>
+            <div class="receipt-total"><span>Receipt Total</span><strong id="booking-receipt-total">৳ 0</strong></div>
+            <div class="form-actions"><button class="primary" type="submit">Create &amp; Preview Receipt</button><button id="booking-receipt-reset" class="secondary" type="button">Clear</button></div>
+          </form>
+
+          <form id="money-receipt-form" class="panel form-panel receipt-form" hidden>
+            <div class="receipt-form-heading"><div><h2>Money Receipt তৈরি করুন</h2><p>কে, কবে, কী কারণে টাকা দিয়েছে এবং কে গ্রহণ করেছে—সব তথ্য থাকবে।</p></div></div>
+            <div class="form-grid"><label>Receipt Date<input name="receipt_date" type="date" required></label><label>Received From / প্রদানকারী<input name="received_from" placeholder="যিনি টাকা দিয়েছেন" required maxlength="160"></label><label>Received By / গ্রহণকারী<input name="received_by" required maxlength="120"></label><label>Amount (BDT)<div class="money-input"><span>৳</span><input name="amount" type="number" min="0.01" step="0.01" inputmode="decimal" required></div></label><label>Payment Method<select name="payment_method"><option>Cash</option><option>Bank</option><option>bKash</option><option>Nagad</option><option>Card</option><option>Other</option></select></label><label>Purpose<input name="purpose" placeholder="যেমন: Visa processing fee" required maxlength="240"></label><label class="wide-field">Note <span class="optional">Optional</span><textarea name="note" rows="2" maxlength="1000" placeholder="অতিরিক্ত তথ্য"></textarea></label></div>
+            <p class="signature-note">Print করা receipt-এ প্রদানকারী ও গ্রহণকারীর signature-এর জায়গা থাকবে।</p>
+            <div class="form-actions"><button class="primary" type="submit">Create &amp; Preview Receipt</button><button id="money-receipt-reset" class="secondary" type="button">Clear</button></div>
+          </form>
+
+          <section class="panel table-panel receipt-history"><div class="table-heading"><div><h2>Receipt History</h2><p>আগের receipt দেখুন অথবা আবার print করুন।</p></div></div><div class="table-wrap"><table><thead><tr><th>Type</th><th>Receipt No.</th><th>Date</th><th>Customer / From</th><th>Details</th><th class="amount">Amount</th><th>Action</th></tr></thead><tbody id="receipt-body"></tbody></table></div></section>
+        </section>
+
         <section class="page" data-page-content="backup">
           <div class="section-heading"><div><h2>Backup & Restore</h2><p>আপনার হিসাব নিজের কাছে নিরাপদে রাখুন।</p></div></div>
           <div class="backup-grid">
@@ -202,6 +227,8 @@
 
   <dialog id="expense-dialog"><article><button id="dialog-close" class="dialog-close" aria-label="Close">×</button><h2>Expense Details</h2><dl id="expense-details"></dl></article></dialog>
   <dialog id="manpower-dialog"><article><button id="manpower-dialog-close" class="dialog-close" aria-label="Close">×</button><div id="manpower-dialog-content"></div></article></dialog>
-  <script src="app.js?v=passenger-selector-507c7a3"></script>
+  <dialog id="receipt-dialog" class="receipt-dialog"><article><button id="receipt-dialog-close" class="dialog-close" aria-label="Close">×</button><div id="receipt-dialog-content"></div></article></dialog>
+  <section id="receipt-print-area" hidden></section>
+  <script src="app.js?v=receipts-v1"></script>
 </body>
 </html>
