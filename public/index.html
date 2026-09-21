@@ -49,6 +49,12 @@
         <button class="nav-link" data-page="ledger"><span>▤</span> Ledger</button>
         <button class="nav-link" data-page="report"><span>▥</span> Monthly Report</button>
         <button class="nav-link" data-page="types"><span>⊞</span> Expense Types</button>
+        <p class="nav-section">MANPOWER</p>
+        <button class="nav-link" data-page="manpower-dashboard"><span>◈</span> Manpower Overview</button>
+        <button class="nav-link" data-page="passengers"><span>◉</span> Passenger Files</button>
+        <button class="nav-link" data-page="partners"><span>♧</span> Agents &amp; Offices</button>
+        <button class="nav-link" data-page="submissions"><span>⌑</span> Office Contracts</button>
+        <button class="nav-link" data-page="manpower-report"><span>▤</span> Manpower Report</button>
         <button class="nav-link" data-page="backup"><span>⇩</span> Backup</button>
         <button class="nav-link" data-page="settings"><span>⚙</span> Settings</button>
       </nav>
@@ -125,6 +131,56 @@
           </div>
         </section>
 
+        <section class="page" data-page-content="manpower-dashboard">
+          <div class="page-intro manpower-intro"><div><p class="eyebrow">MANPOWER MANAGEMENT</p><h2>Manpower হিসাবের সারসংক্ষেপ</h2><p>Passenger, টাকা পাওয়া, Due এবং অফিসে দেওয়া টাকার হিসাব এক জায়গায়।</p></div><button class="primary" data-go="passengers">＋ Passenger যোগ করুন</button></div>
+          <div class="card-grid manpower-summary-grid">
+            <article class="summary-card navy"><p>মোট Passenger File <span>Total Files</span></p><strong id="mp-total-files">0</strong></article>
+            <article class="summary-card accent"><p>Passenger থেকে পেয়েছি <span>Received</span></p><strong id="mp-total-received">৳ 0</strong></article>
+            <article class="summary-card warning"><p>এখনো পাওনা <span>Due</span></p><strong id="mp-total-due">৳ 0</strong></article>
+            <article class="summary-card blue"><p>অফিসে দেওয়া হয়েছে <span>Office Paid</span></p><strong id="mp-office-paid">৳ 0</strong></article>
+          </div>
+          <section class="panel"><div class="section-heading"><div><h2>সাম্প্রতিক Passenger File</h2><p>Recent passenger records</p></div><button class="text-button" data-go="passengers">সব দেখুন →</button></div><div class="table-wrap"><table><thead><tr><th>Passenger</th><th>Passport</th><th>Agent</th><th>Country</th><th class="amount">Price</th><th class="amount">Due</th><th>Status</th></tr></thead><tbody id="mp-recent-body"></tbody></table></div></section>
+        </section>
+
+        <section class="page" data-page-content="passengers">
+          <div class="section-heading"><div><p class="eyebrow">PASSENGER FILE</p><h2>Passenger হিসাব</h2><p>Passenger-এর তথ্য, মোট Price, Received ও Due হিসাব রাখুন।</p></div></div>
+          <form id="passenger-form" class="panel form-panel passenger-form">
+            <div class="form-grid">
+              <label>Passenger Name<input name="passenger_name" placeholder="পূর্ণ নাম লিখুন" required maxlength="160"></label>
+              <label>Passport Number<input name="passport_number" placeholder="যেমন: A12345678" required maxlength="40" style="text-transform:uppercase"></label>
+              <label>Country<input name="country" placeholder="যেমন: Malaysia" required maxlength="80"></label>
+              <label>Agent Name<select name="agent_id" id="passenger-agent" required><option value="">Agent নির্বাচন করুন</option></select></label>
+              <label>Primary Office <span class="optional">Optional</span><select name="office_id" id="passenger-office"><option value="">Office নির্বাচন করুন</option></select></label>
+              <label>Total Price (BDT)<div class="money-input"><span>৳</span><input name="total_price" type="number" min="0.01" step="0.01" inputmode="decimal" placeholder="0" required></div></label>
+              <label>Status<select name="status"><option value="New">New</option><option value="Submitted">Submitted</option><option value="Processing">Processing</option><option value="Approved">Approved</option><option value="Complete">Complete</option><option value="Cancelled">Cancelled</option></select></label>
+              <label>Note <span class="optional">Optional</span><input name="note" placeholder="অতিরিক্ত তথ্য" maxlength="1000"></label>
+            </div>
+            <div class="form-actions"><button class="primary" id="passenger-save-button" type="submit">Save Passenger File</button><button class="secondary" id="passenger-cancel-button" type="button">Cancel</button></div>
+          </form>
+          <section class="panel filters manpower-filters"><div class="filter-row"><label>Status<select id="passenger-status-filter"><option value="">সব Status</option><option>New</option><option>Submitted</option><option>Processing</option><option>Approved</option><option>Complete</option><option>Cancelled</option></select></label><form id="passenger-search" class="search-box"><input id="passenger-query" type="search" placeholder="নাম, Passport, Agent অথবা Country লিখুন"><button type="submit">Search</button></form></div><p id="passenger-total" class="filter-total">0 টি Passenger File</p></section>
+          <section class="panel table-panel"><div class="table-wrap"><table><thead><tr><th>Passenger</th><th>Passport</th><th>Agent</th><th>Country</th><th class="amount">Price</th><th class="amount">Received</th><th class="amount">Due</th><th>Status</th><th>Action</th></tr></thead><tbody id="passenger-body"></tbody></table></div></section>
+        </section>
+
+        <section class="page" data-page-content="partners">
+          <div class="section-heading"><div><p class="eyebrow">MASTER LISTS</p><h2>Agent ও Office তালিকা</h2><p>একবার নাম যোগ করুন; তারপর Passenger ও Contract ফর্মে ড্রপডাউন থেকে বেছে নিন।</p></div></div>
+          <div class="two-column partner-forms">
+            <form id="agent-form" class="panel small-panel"><h2>＋ Add Agent</h2><label>Agent Name<input name="name" placeholder="Agent-এর নাম" required maxlength="120"></label><label>Phone <span class="optional">Optional</span><input name="phone" placeholder="মোবাইল নম্বর" maxlength="40"></label><button class="primary" type="submit">Save Agent</button></form>
+            <form id="office-form" class="panel small-panel"><h2>＋ Add Office</h2><div class="form-grid compact-form"><label>Office Name<input name="name" placeholder="যে অফিসে কাজ জমা দেন" required maxlength="160"></label><label>Contact Person <span class="optional">Optional</span><input name="contact_person" maxlength="120"></label><label>Phone <span class="optional">Optional</span><input name="phone" maxlength="40"></label><label>Address <span class="optional">Optional</span><input name="address" maxlength="240"></label></div><button class="primary" type="submit">Save Office</button></form>
+          </div>
+          <div class="two-column partner-tables"><section class="panel table-panel"><div class="table-heading"><h2>Agent List</h2></div><div class="table-wrap"><table><thead><tr><th>Agent</th><th>Phone</th><th>Status</th><th>Action</th></tr></thead><tbody id="agent-body"></tbody></table></div></section><section class="panel table-panel"><div class="table-heading"><h2>Office List</h2></div><div class="table-wrap"><table><thead><tr><th>Office</th><th>Contact</th><th>Phone</th><th>Status</th><th>Action</th></tr></thead><tbody id="office-body"></tbody></table></div></section></div>
+        </section>
+
+        <section class="page" data-page-content="submissions">
+          <div class="section-heading"><div><p class="eyebrow">OFFICE CONTRACTS</p><h2>অফিসে কাজ জমা ও Contract</h2><p>কোন Passenger-এর কাজ কোন অফিসে, কত টাকায় ও কোন অবস্থায় আছে—সব লিখুন।</p></div></div>
+          <form id="submission-form" class="panel form-panel submission-form"><div class="form-grid"><label>Passenger<select name="passenger_id" id="submission-passenger" required><option value="">Passenger নির্বাচন করুন</option></select></label><label>Office<select name="office_id" id="submission-office" required><option value="">Office নির্বাচন করুন</option></select></label><label>Contract / File Number <span class="optional">Optional</span><input name="contract_number" placeholder="যেমন: CT-1024" maxlength="80"></label><label>Submission Date<input name="submission_date" type="date" required></label><label>Contract Amount (BDT)<div class="money-input"><span>৳</span><input name="contract_amount" type="number" min="0.01" step="0.01" inputmode="decimal" placeholder="0" required></div></label><label>Status<select name="status"><option value="Submitted">Submitted</option><option value="Processing">Processing</option><option value="Approved">Approved</option><option value="Complete">Complete</option><option value="Cancelled">Cancelled</option><option value="Returned">Returned</option></select></label><label class="wide-field">Note <span class="optional">Optional</span><textarea name="note" rows="2" maxlength="1000" placeholder="কাজ জমা, কাগজ বা অন্যান্য তথ্য"></textarea></label></div><div class="form-actions"><button class="primary" id="submission-save-button" type="submit">Save Contract</button><button class="secondary" id="submission-cancel-button" type="button">Cancel</button></div></form>
+          <section class="panel table-panel"><div class="table-wrap"><table><thead><tr><th>Date</th><th>Passenger</th><th>Office</th><th>Contract No.</th><th class="amount">Contract</th><th class="amount">Paid</th><th class="amount">Due</th><th>Status</th><th>Action</th></tr></thead><tbody id="submission-body"></tbody></table></div></section>
+        </section>
+
+        <section class="page" data-page-content="manpower-report">
+          <div class="section-heading report-print-heading"><div><p class="eyebrow">PRINTABLE REPORT</p><h2>Manpower হিসাবের রিপোর্ট</h2><p>মাসভিত্তিক পাওয়া টাকা, অফিসে দেওয়া টাকা ও Passenger Due হিসাব।</p></div><div class="report-actions"><label class="month-picker">Month<input id="manpower-report-month" type="month"></label><button id="print-manpower-report" class="secondary" type="button">⎙ Print Report</button></div></div>
+          <div id="manpower-print-area"><div class="card-grid manpower-summary-grid"><article class="summary-card accent"><p>এই মাসে Passenger থেকে পেয়েছি</p><strong id="mp-report-received">৳ 0</strong></article><article class="summary-card blue"><p>এই মাসে Office-এ দিয়েছি</p><strong id="mp-report-office-paid">৳ 0</strong></article><article class="summary-card warning"><p>সব Passenger-এর Due</p><strong id="mp-report-total-due">৳ 0</strong></article><article class="summary-card navy"><p>Active File</p><strong id="mp-report-active-files">0</strong></article></div><section class="panel table-panel"><div class="table-heading"><div><h2>Passenger হিসাব</h2><p>Price, Received ও Due</p></div></div><div class="table-wrap"><table><thead><tr><th>Passenger</th><th>Agent</th><th>Country</th><th class="amount">Price</th><th class="amount">Received</th><th class="amount">Due</th><th>Status</th></tr></thead><tbody id="mp-report-body"></tbody></table></div></section></div>
+        </section>
+
         <section class="page" data-page-content="backup">
           <div class="section-heading"><div><h2>Backup & Restore</h2><p>আপনার হিসাব নিজের কাছে নিরাপদে রাখুন।</p></div></div>
           <div class="backup-grid">
@@ -145,6 +201,7 @@
   </div>
 
   <dialog id="expense-dialog"><article><button id="dialog-close" class="dialog-close" aria-label="Close">×</button><h2>Expense Details</h2><dl id="expense-details"></dl></article></dialog>
+  <dialog id="manpower-dialog"><article><button id="manpower-dialog-close" class="dialog-close" aria-label="Close">×</button><div id="manpower-dialog-content"></div></article></dialog>
   <script src="app.js"></script>
 </body>
 </html>
